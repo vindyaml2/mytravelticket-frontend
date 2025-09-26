@@ -67,7 +67,26 @@ class RouteListPageState extends State<RouteListPage> {
     }
   }
 
-  Future<void> openMap(double latitude, double longitude, String stopName) async {
+  Future<void> openMap(double? latitude, double? longitude, String stopName) async {
+    if (latitude == null || longitude == null) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Map Location Unavailable', style: TextStyle(color: Colors.teal)),
+            content: const Text('Map location not available for this stop.', style: TextStyle(color: Colors.grey)),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK', style: TextStyle(color: Colors.teal)),
+              ),
+            ],
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          );
+        },
+      );
+      return;
+    }
     String googleUrl = 'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude&query_place_id=$stopName';
     final Uri url = Uri.parse(googleUrl);
     if (await url_launcher.canLaunchUrl(url)) {
@@ -542,14 +561,27 @@ class RouteListPageState extends State<RouteListPage> {
                               onTap: () async {
                                 try {
                                   final busStopDetails = await fetchBusStopDetails(stop['id']);
-                                  if (busStopDetails != null) {
-                                    double latitude = busStopDetails['latitude'];
-                                    double longitude = busStopDetails['longitude'];
+                                  if (busStopDetails != null && busStopDetails.containsKey('latitude') && busStopDetails.containsKey('longitude')) {
+                                    double? latitude = busStopDetails['latitude'];
+                                    double? longitude = busStopDetails['longitude'];
                                     String stopName = busStopDetails['stopName'];
                                     await openMap(latitude, longitude, stopName);
                                   } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Failed to load bus stop details', style: TextStyle(color: Colors.white)), backgroundColor: Colors.red),
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: const Text('Map Location Unavailable', style: TextStyle(color: Colors.teal)),
+                                          content: const Text('Map location not available for this stop.', style: TextStyle(color: Colors.grey)),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              onPressed: () => Navigator.of(context).pop(),
+                                              child: const Text('OK', style: TextStyle(color: Colors.teal)),
+                                            ),
+                                          ],
+                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                                        );
+                                      },
                                     );
                                   }
                                 } catch (e) {

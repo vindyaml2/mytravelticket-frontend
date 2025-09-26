@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:mytravelticket_frontend/AssignBusDriverConductorRoutePage.dart';
+import 'package:mytravelticket_frontend/DriverFormPage.dart';
+import 'package:mytravelticket_frontend/DriverListPage.dart';
 import 'package:mytravelticket_frontend/route_list_page.dart';
 import 'UserFormPage.dart';
 import 'route_input_page.dart';
+import 'ConductorFormPage.dart'; // Import the ConductorFormPage
+import 'ConductorListPage.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,13 +19,40 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Navigation Demo',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: ThemeData(
+        primarySwatch: Colors.teal,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.teal,
+          titleTextStyle: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+          iconTheme: IconThemeData(color: Colors.white),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.teal,
+            foregroundColor: Colors.white,
+            textStyle: const TextStyle(fontSize: 18),
+            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        ),
+      ),
       initialRoute: '/',
       routes: {
         '/': (context) => const MainNavigationPage(),
         '/userForm': (context) => const UserFormPage(),
         '/routeInput': (context) => const RouteInputPage(),
         '/route': (context) => const RouteListPage(),
+        '/driverForm': (context) => const DriverFormPage(),
+        '/driverList': (context) => const DriverListPage(),
+        '/conductorForm': (context) => const ConductorFormPage(), 
+        '/conductorList': (context) => const ConductorListPage(),
+        '/assignBusDriverConductorRoute': (context) => const AssignBusDriverConductorRoutePage(),
       },
     );
   }
@@ -32,38 +64,26 @@ class MainNavigationPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Main Navigation')),
+      appBar: AppBar(
+        title: const Text('Main Navigation', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.teal,
+      ),
+      backgroundColor: Colors.grey[100],
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Navigate to User Form Page
             ElevatedButton(
               onPressed: () {
                 Navigator.pushNamed(context, '/userForm');
               },
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 40,
-                  vertical: 20,
-                ),
-                textStyle: const TextStyle(fontSize: 18),
-              ),
               child: const Text('Register User'),
             ),
             const SizedBox(height: 30),
-            // Navigate to Route Input Page
             ElevatedButton(
               onPressed: () {
                 Navigator.pushNamed(context, '/routeInput');
               },
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 40,
-                  vertical: 20,
-                ),
-                textStyle: const TextStyle(fontSize: 18),
-              ),
               child: const Text('Create a new Bus Route'),
             ),
             const SizedBox(height: 30),
@@ -71,14 +91,42 @@ class MainNavigationPage extends StatelessWidget {
               onPressed: () {
                 Navigator.pushNamed(context, '/route');
               },
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 40,
-                  vertical: 20,
-                ),
-                textStyle: const TextStyle(fontSize: 18),
-              ),
               child: const Text('All Bus Route'),
+            ),
+            const SizedBox(height: 30),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/driverForm');
+              },
+              child: const Text('Register Driver'),
+            ),
+            const SizedBox(height: 30),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/driverList');
+              },
+              child: const Text('All Drivers'),
+            ),
+            const SizedBox(height: 30),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/conductorForm');
+              },
+              child: const Text('Register Conductor'),
+            ),
+            const SizedBox(height: 30),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/conductorList');
+              },
+              child: const Text('All Conductors'),
+            ),
+             const SizedBox(height: 30),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/assignBusDriverConductorRoute');
+              },
+              child: const Text('All assigned BusDriverConductorRoute'),
             ),
           ],
         ),

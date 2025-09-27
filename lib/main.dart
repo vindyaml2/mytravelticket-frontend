@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mytravelticket_frontend/AssignBusDriverConductorRoutePage.dart';
+import 'package:mytravelticket_frontend/GetBusDriverConductorRoutePage.dart';
 import 'package:mytravelticket_frontend/DriverFormPage.dart';
 import 'package:mytravelticket_frontend/DriverListPage.dart';
 import 'package:mytravelticket_frontend/route_list_page.dart';
@@ -52,6 +53,7 @@ class MyApp extends StatelessWidget {
         '/driverList': (context) => const DriverListPage(),
         '/conductorForm': (context) => const ConductorFormPage(), 
         '/conductorList': (context) => const ConductorListPage(),
+        '/getBusDriverConductorRoute': (context) => const GetBusDriverConductorRoutePage(),
         '/assignBusDriverConductorRoute': (context) => const AssignBusDriverConductorRoutePage(),
       },
     );
@@ -124,9 +126,16 @@ class MainNavigationPage extends StatelessWidget {
              const SizedBox(height: 30),
             ElevatedButton(
               onPressed: () {
-                Navigator.pushNamed(context, '/assignBusDriverConductorRoute');
+                Navigator.pushNamed(context, '/getBusDriverConductorRoute');
               },
               child: const Text('All assigned BusDriverConductorRoute'),
+            ),
+             const SizedBox(height: 30),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/assignBusDriverConductorRoute');
+              },
+              child: const Text('Assigne BusDriverConductorRoute'),
             ),
           ],
         ),

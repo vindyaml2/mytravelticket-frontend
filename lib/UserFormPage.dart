@@ -17,6 +17,7 @@ class _UserFormPageState extends State<UserFormPage> {
   final _aadharController = TextEditingController();
   final _panController = TextEditingController();
   final _addressController = TextEditingController();
+  String? _userType;
 
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
@@ -27,6 +28,7 @@ class _UserFormPageState extends State<UserFormPage> {
         "aadharNumber": _aadharController.text,
         "panNumber": _panController.text,
         "address": _addressController.text,
+        "userType": _userType
       };
 
       const url = 'http://localhost:8080/user'; // Replace with your actual URL
@@ -71,33 +73,46 @@ class _UserFormPageState extends State<UserFormPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('User Registration'),
-        backgroundColor: Colors.blueAccent,
+        title: const Text('User Registration', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.teal,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildTextField(_firstNameController, 'First Name'),
-              _buildTextField(_lastNameController, 'Last Name'),
-              _buildTextField(_passwordController, 'Password', obscureText: true),
-              _buildTextField(_aadharController, 'Aadhar Number'),
-              _buildTextField(_panController, 'PAN Number'),
-              _buildTextField(_addressController, 'Address', maxLines: 3),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _submitForm,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                  backgroundColor: Colors.blueAccent,
-                  foregroundColor: Colors.white,
-                ),
-                child: const Text('Register User', style: TextStyle(fontSize: 16)),
+      backgroundColor: Colors.grey[100],
+      body: Center( // Wrap the content in a Center widget
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20.0),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: 500), // Limit the width of the form
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _buildTextField(_firstNameController, 'First Name'),
+                  _buildTextField(_lastNameController, 'Last Name'),
+                  _buildTextField(_passwordController, 'Password', obscureText: true),
+                  _buildTextField(_aadharController, 'Aadhar Number'),
+                  _buildTextField(_panController, 'PAN Number'),
+                  _buildTextField(_addressController, 'Address', maxLines: 3),
+                  _buildDropdownField(),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _submitForm,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.teal,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 20), // Adjust padding
+                      textStyle: const TextStyle(fontSize: 16), // Set text style
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25), // More rounded corners
+                      ),
+                      elevation: 5, // Add a subtle shadow
+                    ),
+                    child: const Text('Register User'),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
@@ -113,19 +128,64 @@ class _UserFormPageState extends State<UserFormPage> {
         maxLines: maxLines,
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: const TextStyle(color: Colors.blueAccent),
+          labelStyle: TextStyle(color: Colors.grey[700]),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(color: Colors.grey),
+            borderSide: BorderSide(color: Colors.grey[400]!),
           ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(color: Colors.blueAccent, width: 2),
+          focusedBorder: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10)),
+            borderSide: BorderSide(color: Colors.teal, width: 2),
           ),
+          filled: true,
+          fillColor: Colors.white,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         ),
         validator: (value) {
           if (value == null || value.isEmpty) {
             return 'Please enter your $label';
+          }
+          return null;
+        },
+      ),
+    );
+  }
+
+  Widget _buildDropdownField() {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 15.0),
+      child: DropdownButtonFormField<String>(
+        decoration: InputDecoration(
+          labelText: 'User Type',
+          labelStyle: TextStyle(color: Colors.grey[700]),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide(color: Colors.grey[400]!),
+          ),
+          focusedBorder: const OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10)),
+            borderSide: BorderSide(color: Colors.teal, width: 2),
+          ),
+          filled: true,
+          fillColor: Colors.white,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        ),
+        value: _userType,
+        items: <String>['DRIVER', 'PASSENGER', 'ADMIN', 'CONDUCTOR']
+            .map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+          );
+        }).toList(),
+        onChanged: (String? newValue) {
+          setState(() {
+            _userType = newValue;
+          });
+        },
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Please select a User Type';
           }
           return null;
         },

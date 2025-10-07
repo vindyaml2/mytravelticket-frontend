@@ -8,6 +8,7 @@ import 'UserFormPage.dart';
 import 'route_input_page.dart';
 import 'ConductorFormPage.dart'; // Import the ConductorFormPage
 import 'ConductorListPage.dart';
+import 'TicketPage.dart';
 
 void main() {
   runApp(const MyApp());
@@ -55,6 +56,7 @@ class MyApp extends StatelessWidget {
         '/conductorList': (context) => const ConductorListPage(),
         '/getBusDriverConductorRoute': (context) => const GetBusDriverConductorRoutePage(),
         '/assignBusDriverConductorRoute': (context) => const AssignBusDriverConductorRoutePage(),
+        '/ticket':(context) => const TicketPage(),
       },
     );
   }
@@ -71,73 +73,99 @@ class MainNavigationPage extends StatelessWidget {
         backgroundColor: Colors.teal,
       ),
       backgroundColor: Colors.grey[100],
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/userForm');
-              },
-              child: const Text('Register User'),
-            ),
-            const SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/routeInput');
-              },
-              child: const Text('Create a new Bus Route'),
-            ),
-            const SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/route');
-              },
-              child: const Text('All Bus Route'),
-            ),
-            const SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/driverForm');
-              },
-              child: const Text('Register Driver'),
-            ),
-            const SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/driverList');
-              },
-              child: const Text('All Drivers'),
-            ),
-            const SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/conductorForm');
-              },
-              child: const Text('Register Conductor'),
-            ),
-            const SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/conductorList');
-              },
-              child: const Text('All Conductors'),
-            ),
-             const SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/getBusDriverConductorRoute');
-              },
-              child: const Text('All assigned BusDriverConductorRoute'),
-            ),
-             const SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/assignBusDriverConductorRoute');
-              },
-              child: const Text('Assigne BusDriverConductorRoute'),
-            ),
-          ],
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.60,
+                  child: _buildNavigationCard(context, '/userForm', 'Register User'),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Center(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.60,
+                  child: _buildNavigationCard(context, '/routeInput', 'Create a new Bus Route'),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Center(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.60,
+                  child: _buildNavigationCard(context, '/route', 'All Bus Route'),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Center(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.60,
+                  child: _buildNavigationCard(context, '/driverForm', 'Register Driver'),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Center(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.60,
+                  child: _buildNavigationCard(context, '/driverList', 'All Drivers'),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Center(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.60,
+                  child: _buildNavigationCard(context, '/conductorForm', 'Register Conductor'),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Center(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.60,
+                  child: _buildNavigationCard(context, '/conductorList', 'All Conductors'),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Center(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.60,
+                  child: _buildNavigationCard(context, '/getBusDriverConductorRoute', 'All assigned BusDriverConductorRoute'),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Center(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.60,
+                  child: _buildNavigationCard(context, '/assignBusDriverConductorRoute', 'Assign BusDriverConductorRoute'),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Center(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.60,
+                  child: _buildNavigationCard(context, '/ticket', 'Create Ticket'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavigationCard(BuildContext context, String routeName, String buttonText) {
+    return Card(
+      elevation: 4,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.pushNamed(context, routeName);
+          },
+          child: Text(buttonText),
         ),
       ),
     );

@@ -3,12 +3,16 @@ import 'package:mytravelticket_frontend/AssignBusDriverConductorRoutePage.dart';
 import 'package:mytravelticket_frontend/GetBusDriverConductorRoutePage.dart';
 import 'package:mytravelticket_frontend/DriverFormPage.dart';
 import 'package:mytravelticket_frontend/DriverListPage.dart';
+import 'package:mytravelticket_frontend/TicketListForUserPage.dart';
+import 'package:mytravelticket_frontend/TicketListPage.dart';
 import 'package:mytravelticket_frontend/route_list_page.dart';
 import 'UserFormPage.dart';
 import 'route_input_page.dart';
 import 'ConductorFormPage.dart'; // Import the ConductorFormPage
 import 'ConductorListPage.dart';
 import 'TicketPage.dart';
+import 'BusPage.dart';
+import 'BusListpage.dart';
 
 void main() {
   runApp(const MyApp());
@@ -57,6 +61,11 @@ class MyApp extends StatelessWidget {
         '/getBusDriverConductorRoute': (context) => const GetBusDriverConductorRoutePage(),
         '/assignBusDriverConductorRoute': (context) => const AssignBusDriverConductorRoutePage(),
         '/ticket':(context) => const TicketPage(),
+        '/get-all-ticket':(context) => const TicketListPage(),
+        '/ticket-userid':(context) => const TicketListForUserPage(),
+        '/bus': (context) => const Buspage(),
+        '/buslist': (context) => const Buslistpage(),
+
       },
     );
   }
@@ -147,6 +156,34 @@ class MainNavigationPage extends StatelessWidget {
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width * 0.60,
                   child: _buildNavigationCard(context, '/ticket', 'Create Ticket'),
+                ),
+              ),
+              const SizedBox(height: 16),
+               Center(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.60,
+                  child: _buildNavigationCard(context, '/get-all-ticket', 'Get All Ticket'),
+                ),
+              ),
+              const SizedBox(height: 16),
+               Center(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.60,
+                  child: _buildNavigationCard(context, '/ticket-userid', 'Get All Ticket for User' ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Center(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.60,
+                  child: _buildNavigationCard(context, '/bus', 'Create Bus'),
+                ),
+              ),
+               const SizedBox(height: 16),
+              Center(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.60,
+                  child: _buildNavigationCard(context, '/buslist', 'Get all Bus'),
                 ),
               ),
             ],

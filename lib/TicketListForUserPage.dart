@@ -116,6 +116,160 @@ class _TicketListForUserPageState extends State<TicketListForUserPage> {
     }
   }
 
+  Future<void> validateTicket(Ticket ticket, String scannedId) async {
+    try {
+      // Call API to validate the ticket
+      final response = await http.post(
+        Uri.parse('http://localhost:8080/ticket/validate'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'ticketId': ticket.id,
+          'scannedId': scannedId,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        final bool isValid = responseData['valid'] ?? false;
+        _showValidationResult(context, isValid, ticket);
+      } else {
+        // Fallback: validate locally if API not available
+        _showValidationResult(context, scannedId == '${ticket.id}', ticket);
+      }
+    } catch (e) {
+      // Fallback: validate locally
+      print('Validation error: $e');
+      _showValidationResult(context, scannedId == '${ticket.id}', ticket);
+    }
+  }
+
+  void _showQRCodeDialog(BuildContext context, Ticket ticket) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Ticket QR Code'),
+          content: SizedBox(
+            width: 250,
+            height: 250,
+            child: SingleChildScrollView(
+              child: Center(
+                child: Column(
+                  children: [
+                    QrImageView(
+                      data: '${ticket.id}',
+                      version: QrVersions.auto,
+                      size: 200.0,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Ticket ID: ${ticket.id}',
+                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Validate Ticket'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _showValidationDialog(context, ticket);
+              },
+            ),
+            TextButton(
+              child: const Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showValidationDialog(BuildContext context, Ticket ticket) {
+    final TextEditingController ticketIdController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Validate Ticket'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text('Enter the scanned ticket ID to validate:'),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: ticketIdController,
+                  decoration: InputDecoration(
+                    labelText: 'Scanned Ticket ID',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey[200],
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Validate'),
+              onPressed: () {
+                final String scannedId = ticketIdController.text.trim();
+                Navigator.of(context).pop();
+                if (scannedId.isNotEmpty) {
+                  validateTicket(ticket, scannedId);
+                } else {
+                  _showValidationResult(context, false, ticket);
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showValidationResult(BuildContext context, bool isValid, Ticket ticket) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(isValid ? 'Ticket Valid ✓' : 'Ticket Invalid ✗'),
+          backgroundColor: isValid ? Colors.green[50] : Colors.red[50],
+          content: Text(
+            isValid
+                ? 'Ticket ID ${ticket.id} has been successfully validated.\n\nRoute: ${ticket.startPoint} → ${ticket.endPoint}\nPrice: \$${ticket.price}'
+                : 'The scanned ticket ID does not match this ticket.\n\nExpected: ${ticket.id}',
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -232,35 +386,7 @@ class _TicketListForUserPageState extends State<TicketListForUserPage> {
                                 ],
                               ),
                               onTap: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: const Text('Ticket QR Code'),
-                                      content: SizedBox(
-                                        width: 250,
-                                        height: 250,
-                                        child: SingleChildScrollView(
-                                          child: Center(
-                                            child: QrImageView(
-                                              data: '${ticket.id}',
-                                              version: QrVersions.auto,
-                                              size: 200.0,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      actions: <Widget>[
-                                        TextButton(
-                                          child: const Text('Close'),
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
+                                _showQRCodeDialog(context, ticket);
                               },
                             ),
                           );

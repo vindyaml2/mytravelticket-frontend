@@ -5,6 +5,7 @@ import 'package:mytravelticket_frontend/DriverFormPage.dart';
 import 'package:mytravelticket_frontend/DriverListPage.dart';
 import 'package:mytravelticket_frontend/TicketListForUserPage.dart';
 import 'package:mytravelticket_frontend/TicketListPage.dart';
+import 'package:mytravelticket_frontend/ValidateTicketPage.dart';
 import 'package:mytravelticket_frontend/route_list_page.dart';
 import 'UserFormPage.dart';
 import 'route_input_page.dart';
@@ -61,6 +62,7 @@ class MyApp extends StatelessWidget {
         '/getBusDriverConductorRoute': (context) => const GetBusDriverConductorRoutePage(),
         '/assignBusDriverConductorRoute': (context) => const AssignBusDriverConductorRoutePage(),
         '/ticket':(context) => const TicketPage(),
+        '/validateTicket': (context) => const ValidateTicketPage(),
         '/get-all-ticket':(context) => const TicketListPage(),
         '/ticket-userid':(context) => const TicketListForUserPage(),
         '/bus': (context) => const Buspage(),
@@ -156,6 +158,12 @@ class MainNavigationPage extends StatelessWidget {
                 child: SizedBox(
                   width: MediaQuery.of(context).size.width * 0.60,
                   child: _buildNavigationCard(context, '/ticket', 'Create Ticket'),
+                ),
+              ),
+               Center(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.60,
+                  child: _buildNavigationCard(context, '/validateTicket', 'Validate Ticket'),
                 ),
               ),
               const SizedBox(height: 16),

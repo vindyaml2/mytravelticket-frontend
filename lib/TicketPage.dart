@@ -93,11 +93,11 @@ class _TicketPageState extends State<TicketPage> {
         }
       });
     } else {
-      throw Exception('Failed to load bus stops');
+      print('Failed to load bus stops: ${response.statusCode}');
     }
   }
 
-  // Function to create a ticket
+  // ✅ CORRECTED FUNCTION USING HTTP.POST() FOR PRICE CALCULATION
   Future<void> createTicket() async {
     if (selectedBus == null || selectedUser == null || selectedRoute == null || selectedStartPoint == null || selectedEndPoint == null) {
       // Show an error message if any of the values are not selected
@@ -122,117 +122,118 @@ class _TicketPageState extends State<TicketPage> {
     }
 
     final Map<String, dynamic> requestBody = {
-      "price": 15,
+      // price is a placeholder for the final POST, it will be updated with the calculated cost
+      "price": 0,
       "busId": selectedBus!.id,
       "userId": selectedUser!.id,
       "routeId": selectedRoute!.id,
       "busStopStartPoint": selectedStartPoint!.id,
-      "busStopEndPoin": selectedEndPoint!.id,
+      "busStopEndPoin": selectedEndPoint!.id, // Typo kept for consistency
+      "ticketStatus": TicketStatus.CREATED.toString().split('.').last,
     };
 
-    final response = await http.get(
-      Uri.parse('http://localhost:8080/ticket/price?busStopStartPoint=${requestBody["busStopStartPoint"]}&busStopEndPoin=${requestBody["busStopEndPoin"]}'),
-      headers: {'Content-Type': 'application/json', 'accept': '*/*'}
+    // Prepare body for the /ticket/price endpoint (which expects a Ticket object via @RequestBody)
+    final Map<String, dynamic> priceRequestBody = {
+      "busStopStartPoint": requestBody["busStopStartPoint"],
+      "busStopEndPoin": requestBody["busStopEndPoin"],
+      // Include any other required fields for the server's Ticket object if needed for deserialization:
+      // "busId": selectedBus!.id, 
+      // "userId": selectedUser!.id,
+      // "routeId": selectedRoute!.id,
+    };
+
+    // 🚩 FIX: Changed from http.get to http.post and sending the JSON body
+    final response = await http.post(
+      Uri.parse('http://localhost:8080/ticket/price'), // Standard endpoint without query params
+      headers: {'Content-Type': 'application/json', 'accept': '*/*'},
+      body: jsonEncode(priceRequestBody), // Sending JSON body
     );
 
     if (response.statusCode == 202) {
-      // Show a success message
+      final double totalCost = double.parse(response.body);
+
+      // Update the requestBody with the calculated price before the final POST
+      requestBody["price"] = totalCost;
+
+      // Show a dialog to confirm ticket creation
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('Success'),
-            content: const Text('Ticket created successfully.'),
+            title: const Text('Total Cost'),
+            content: Text('The total cost is ₹${totalCost.toStringAsFixed(2)}. Do you want to confirm the ticket?'),
             actions: [
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: const Text('OK'),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  Navigator.of(context).pop(); // Close the cost dialog
+
+                  // Final API call to create the ticket
+                  final ticketResponse = await http.post(
+                    Uri.parse('http://localhost:8080/ticket'),
+                    headers: {'Content-Type': 'application/json', 'accept': '*/*'},
+                    body: jsonEncode(requestBody), // Use the updated requestBody with the calculated price
+                  );
+
+                  if (ticketResponse.statusCode == 200) {
+                    // Show success message
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text('Success'),
+                          content: const Text('Ticket created successfully.'),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text('OK'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  } else {
+                    // Show error message
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text('Error'),
+                          content: Text('Failed to create ticket. Status code: ${ticketResponse.statusCode}'),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text('OK'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  }
+                },
+                child: const Text('Confirm'),
               ),
             ],
           );
         },
       );
-    final double totalCost = double.parse(response.body);
-
-    // Show a dialog to confirm ticket creation
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-      title: const Text('Total Cost'),
-      content: Text('The total cost is ₹${totalCost.toStringAsFixed(2)}. Do you want to confirm the ticket?'),
-      actions: [
-        TextButton(
-          onPressed: () {
-        Navigator.of(context).pop();
-          },
-          child: const Text('Cancel'),
-        ),
-        TextButton(
-          onPressed: () async {
-        Navigator.of(context).pop(); // Close the dialog
-        final ticketResponse = await http.post(
-          Uri.parse('http://localhost:8080/ticket'),
-          headers: {'Content-Type': 'application/json', 'accept': '*/*'},
-          body: jsonEncode(requestBody),
-        );
-
-        if (ticketResponse.statusCode == 202) {
-          // Show success message
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Success'),
-            content: const Text('Ticket created successfully.'),
-            actions: [
-              TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text('OK'),
-              ),
-            ],
-          );
-            },
-          );
-        } else {
-          // Show error message
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Error'),
-            content: Text('Failed to create ticket. Status code: ${ticketResponse.statusCode}'),
-            actions: [
-              TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text('OK'),
-              ),
-            ],
-          );
-            },
-          );
-        }
-          },
-          child: const Text('Confirm'),
-        ),
-      ],
-        );
-      },
-    );
     } else {
-      // Show an error message
+      // Show an error message for the price calculation call
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('Error'),
-            content: Text('Failed to create ticket. Status code: ${response.statusCode}'),
+            content: Text('Failed to calculate ticket price. Status code: ${response.statusCode}\nBody: ${response.body}'),
             actions: [
               TextButton(
                 onPressed: () {
@@ -415,4 +416,10 @@ class BusStop {
       stopName: json['stopName'],
     );
   }
+}
+
+enum TicketStatus{
+  CREATED,
+  RIDESTARTED,
+  RIDECOMPLETE
 }
